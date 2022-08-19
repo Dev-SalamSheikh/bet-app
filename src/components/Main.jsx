@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./styles/main.scss";
 import { makeWheel } from "./utils/makewheel";
 
 const Main = () => {
+  const wheelRef = useRef();
   const colorObj = {
     purple: "#406c82",
     yellow: "#fde905",
@@ -15,6 +16,7 @@ const Main = () => {
   const [wheel, setWheel] = useState([]);
   const [risk, setRisk] = useState("Medium");
   const [segment, setSegment] = useState(10);
+  const [deg, setDeg] = useState(0);
 
   const initializeWheel = () => {
     return makeWheel(segment, risk, colorObj);
@@ -25,6 +27,17 @@ const Main = () => {
     setWheel(wheelValue?.wheelData);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [segment, risk]);
+
+  const menualStart = () => {
+    if (wheelRef.current) {
+      let randomDeg = Math.floor(800 + Math.random() * 1000);
+      const mod = randomDeg % 360;
+      randomDeg = randomDeg - (mod % (360 / segment));
+      wheelRef.current.style.transition = "all 3s";
+      wheelRef.current.style.transform = `rotate(${randomDeg}deg)`;
+      setDeg(randomDeg);
+    }
+  };
 
   return (
     <div className="main-area">
@@ -122,7 +135,9 @@ const Main = () => {
               {control === "auto" ? (
                 <button className="bet">Auto Start</button>
               ) : (
-                <button className="bet">Bet</button>
+                <button onClick={menualStart} className="bet">
+                  Bet
+                </button>
               )}
             </div>
           </div>
@@ -133,7 +148,9 @@ const Main = () => {
               <img src="./arrow.png" alt="arrow" />
             </span>
             <div className="temp">
-              <div className="wheel">{[...wheel]}</div>
+              <div className="wheel" ref={wheelRef}>
+                {[...wheel]}
+              </div>
             </div>
           </div>
         </div>
